@@ -1,11 +1,17 @@
 import logo from './logo.svg';
 import './App.css';
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {Navbar, Nav, NavDropdown, Jumbotron, Button, Spinner } from 'react-bootstrap';
 import { data } from "./data";
 import Detail from "./Detail";
+import Cart from "./Cart";
 import {Link, Route, Switch} from 'react-router-dom';
 import axios from "axios";
+
+
+//같은 값을 공유할 범위 지정
+export let stockContext = React.createContext();
+export let setStockContext = React.createContext();
 
 function App() {
 
@@ -52,15 +58,19 @@ function App() {
 
 
           <div className="container">
-            <div className="row">
-              {
-                shoes.map(function (shoes,i) {
-                  return(
-                      <Product product={shoes} key={shoes.id}/>
-                  );
-                })
-              }
-            </div>
+
+            <stockContext.Provider value={stock}>
+
+              <div className="row">
+                {
+                  shoes.map(function (shoes,i) {
+                    return(
+                        <Product product={shoes} key={shoes.id}/>
+                    );
+                  })
+                }
+              </div>
+            </stockContext.Provider>
             <button className="btn btn-primary" onClick={()=>{
               setShowSpinner(true);
 
@@ -92,8 +102,17 @@ function App() {
         </Route>
 
         <Route path="/detail/:id">
-          <Detail product={shoes} stock={stock} setStock={setStock}/>
+          <stockContext.Provider value={stock}>
+          <setStockContext.Provider value={setStock}>
+          <Detail product={shoes}/>
+          </setStockContext.Provider>
+          </stockContext.Provider>
         </Route>
+
+        <Route path="/cart">
+          <Cart></Cart>
+        </Route>
+
       </Switch>
 
 
@@ -103,12 +122,16 @@ function App() {
 }
 
 function Product(props) {
+  //</stockContext.Provider> 가져오기
+  let stock = useContext(stockContext);
+
   return (
       <div className="col-md-4">
         <Link to={"/detail/"+props.product.id}>
             <img src={"https://codingapple1.github.io/shop/shoes"+ (props.product.id+1) +".jpg"} width="100%"/>
             <h4>{props.product.title}</h4>
             <p>{ props.product.content } & { props.product.price }</p>
+            <p>재고 : {stock[0]}</p>
         </Link>
       </div>
   )

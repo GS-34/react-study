@@ -1,8 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import './Detail.scss';
-
+import {stockContext,setStockContext} from "./App";
+import {Nav} from "react-bootstrap";
+import {CSSTransition} from "react-transition-group";
 
 let 박스 = styled.div`
   padding : 20px;
@@ -22,6 +24,13 @@ function Detail(props) {
   let product = props.product.find(element => element.id == id);
 
   let [isShowAlert, setShowAlert] = useState(true);
+  let [switchs,setSwitch] = useState(false);
+
+  let [tab, setTab] = useState(0);
+
+  let stock = useContext(stockContext);
+  let setStock = useContext(setStockContext);
+
 
   //랜더링이 완료 된 후 실행
   useEffect(() => {
@@ -66,13 +75,13 @@ function Detail(props) {
               <p>상품설명</p>
               <p>{product.price} 원</p>
 
-              <Info stock={props.stock} />
+              <Info/>
 
               <button className="btn btn-danger" onClick={()=>{
 
-                let array = [...props.stock];
+                let array = [...stock];
                 array[0]--;
-                props.setStock(array);
+                setStock(array);
 
               }}>주문하기</button>
 
@@ -83,6 +92,22 @@ function Detail(props) {
 
             </div>
           </div>
+
+          <Nav variant="tabs" className="mt-5" defaultKey="link-0">
+            <Nav.Item>
+              <Nav.Link eventKey="link-0" onClick={()=>{setTab(0);setSwitch(false);}}>Active</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="link-1" onClick={()=>{setTab(1);setSwitch(false);}}>Option 2</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="link-2" onClick={()=>{setTab(2);setSwitch(false);}}>Option 3</Nav.Link>
+            </Nav.Item>
+          </Nav>
+
+          <CSSTransition in={switchs} classNames="wow" timeout={500}>
+            <TabContent tab={tab} setSwitch={setSwitch}/>
+          </CSSTransition>
         </div>
     )
   } else {
@@ -96,10 +121,28 @@ function Detail(props) {
 
 }
 
-function Info(props){
+function Info(){
+
+  let stock = useContext(stockContext);
+
   return (
-      <p>재고 : {props.stock[0]}</p>
+      <p>재고 : {stock[0]}</p>
   )
+}
+
+function TabContent(props){
+
+  useEffect(()=>{
+    props.setSwitch(true);
+  });
+
+  if(props.tab === 0){
+    return <div>0번째 내용입니다.</div>
+  } else if (props.tab === 1){
+    return <div>1번째 내용입니다.</div>
+  } else if (props.tab === 2){
+    return <div>2번째 내용입니다.</div>
+  }
 }
 
 // class Detail2 extends React.Component {

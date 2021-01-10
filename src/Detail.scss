@@ -4,6 +4,18 @@ $메인칼라 : #ff0000;
   color : $메인칼라;
 }
 
+.wow-enter {
+  /* wow 애니매이션 시작할때*/
+  opacity: 0;
+}
+
+.wow-enter-active {
+  /* wow 애니매이션 동작할때*/
+  opacity: 1;
+  transition: all 500ms;
+}
+
+
 div.container {
   h4 {
     color : blue;
